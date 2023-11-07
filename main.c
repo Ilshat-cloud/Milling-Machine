@@ -22,7 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#if Comissioning==1   
+#include "stdio.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +59,8 @@ TIM_HandleTypeDef htim13;
 TIM_HandleTypeDef htim14;
 
 UART_HandleTypeDef huart4;
+DMA_HandleTypeDef hdma_uart4_rx;
+DMA_HandleTypeDef hdma_uart4_tx;
 
 /* Definitions for MainTask */
 osThreadId_t MainTaskHandle;
@@ -77,7 +81,7 @@ osThreadId_t feedHandle;
 const osThreadAttr_t feed_attributes = {
   .name = "feed",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal2,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
 //--------my global variables----------//
@@ -894,8 +898,15 @@ static void MX_DMA_Init(void)
 
   /* DMA controller clock enable */
   __HAL_RCC_DMA2_CLK_ENABLE();
+  __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
+  /* DMA1_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+  /* DMA1_Stream4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
   /* DMA2_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
@@ -1291,7 +1302,7 @@ void StartMainTask(void *argument)
     
     
     
-    if (HAL_GPIO_ReadPin(DI_82_S13_m_GPIO_Port,DI_82_S13_m_Pin)==GPIO_PIN_SET) //2t 4t feed control mode
+    if ((HAL_GPIO_ReadPin(DI_82_S13_m_GPIO_Port,DI_82_S13_m_Pin)==GPIO_PIN_SET)&&(feed_motion==0)) //2t 4t feed control mode
     { 
       if ((X_left.pos_previous==GPIO_PIN_SET)&&(X_left.pos_current==GPIO_PIN_RESET))       
       {
@@ -1323,7 +1334,7 @@ void StartMainTask(void *argument)
         feed_motion=6;
         polyarity=0;
       } 
-    } else {
+    } else if (feed_motion==0) {
       if (X_left.pos_current==GPIO_PIN_SET)       
       {
         feed_motion=1;
@@ -1354,7 +1365,7 @@ void StartMainTask(void *argument)
         feed_motion=6;
         polyarity=0;
       }
-      if (!(X_left.pos_current&X_right.pos_current&Y_left.pos_current&Y_right.pos_current&Z_up.pos_current&Z_down.pos_current))
+      if (!(X_left.pos_current|X_right.pos_current|Y_left.pos_current|Y_right.pos_current|Z_up.pos_current|Z_down.pos_current))
       {
         feed_motion=0;
       }
@@ -1385,6 +1396,8 @@ void StartMainTask(void *argument)
         HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement
       }
       break;
     case 2:
@@ -1394,6 +1407,8 @@ void StartMainTask(void *argument)
         HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement        
       }
       break;
     case 3:
@@ -1402,7 +1417,9 @@ void StartMainTask(void *argument)
       } else {        
         HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement        
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement     
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement
       }
       break;   
     case 4:
@@ -1411,7 +1428,9 @@ void StartMainTask(void *argument)
       } else {                
         HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement         
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement      
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement        
       }
       break;
     case 5:
@@ -1420,7 +1439,9 @@ void StartMainTask(void *argument)
       } else {                
         HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_RESET);  
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET); //cluch engadement            
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET); //cluch engadement     
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement      
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement        
       }  
       break;   
     case 6:
@@ -1429,7 +1450,9 @@ void StartMainTask(void *argument)
       } else {             
         HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_RESET);  
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement          
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement   
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement      
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement               
       }
       break;        
     }
@@ -1458,7 +1481,7 @@ void StartMainTask(void *argument)
     }
     if (HAL_GPIO_ReadPin(DI_92_S20_m_GPIO_Port,DI_92_S20_m_Pin)==GPIO_PIN_SET)
     {
-      feed_speed_sp=1000;    //0-1000 /3-buf /4-1024/ 10- 100
+      feed_speed_sp=Feed_Fast_SP;    //0-1000 /3-buf /4-1024/ 10- 100
     }
     //----------------------------------------//
     
@@ -1493,9 +1516,8 @@ void StartMainTask(void *argument)
           M1_motion=2;
         }
       }   
-    } else {
-      M1_motion=0;
-    }
+    } 
+    
     Rocking_btn.pos_previous=Rocking_btn.pos_current;
     Rocking_btn.pos_current=HAL_GPIO_ReadPin(S2rocking_GPIO_Port,S2rocking_Pin);
     if ((Rocking_btn.pos_previous==GPIO_PIN_SET)&&(Rocking_btn.pos_current==GPIO_PIN_RESET)&&(error_my==0)&&(M1_motion==0))
@@ -1504,7 +1526,7 @@ void StartMainTask(void *argument)
     }
     M1_off.pos_previous=M1_off.pos_current;
     M1_off.pos_current=HAL_GPIO_ReadPin(DI_29_S5_m_GPIO_Port,DI_29_S5_m_Pin);
-    if ((M1_off.pos_previous==GPIO_PIN_SET)&&(M1_off.pos_current==GPIO_PIN_RESET))  
+    if ((M1_off.pos_previous==GPIO_PIN_SET)&&(M1_off.pos_current==GPIO_PIN_RESET)&&(M1_motion==1||M1_motion==2))  
     {
       M1_motion=4;
     }
@@ -1577,6 +1599,8 @@ void StartComunication(void *argument)
 {
   /* USER CODE BEGIN StartComunication */
   uint8_t blynk=0,error_counter=0; 
+  unsigned char Ch232[100]={0};
+  HAL_UART_StateTypeDef state_uart;
   /* Infinite loop */
   for(;;)
   {
@@ -1598,6 +1622,15 @@ void StartComunication(void *argument)
     else {
       HAL_GPIO_WritePin(led_manual_GPIO_Port,led_manual_Pin,GPIO_PIN_RESET);
     }
+#if Comissioning==1 
+    state_uart=HAL_UART_GetState(&huart4);
+    if (state_uart!=HAL_UART_STATE_BUSY_TX_RX&&state_uart!=HAL_UART_STATE_BUSY&&state_uart!=HAL_UART_STATE_BUSY_RX&&state_uart!=HAL_UART_STATE_BUSY_TX)
+    {
+      HAL_GPIO_WritePin(RE_DE_GPIO_Port,RE_DE_Pin,GPIO_PIN_SET); //transmit
+      sprintf((char *)Ch232, "%s%d%s%d%s%d%s%d%s%d%s%d%s"," SP-", feed_speed_sp, " FRQ-", Freq_TIM2," IM4-", I_M4, " FdMtn-",feed_motion, "err-", error_my," Pol-",polyarity, "\r\n");
+      HAL_UART_Transmit_DMA(&huart4,Ch232,100);
+    }
+#endif    
   }
   /* USER CODE END StartComunication */
 }
@@ -1612,9 +1645,9 @@ void StartComunication(void *argument)
 void StartFeed(void *argument)
 {
   /* USER CODE BEGIN StartFeed */
-  uint8_t startuem=0, M1_motion_prev,iter; 
+  uint8_t startuem=0, M1_motion_prev=0,iter; 
   uint16_t i=0, Freqency;  //frequency 0-1000 -0 RPM 1000-4000 RPM
-  int16_t errorsold1[256]={0};
+  int16_t errorsold1[200]={0};
   int16_t  Error1;
   int32_t regD1=0,regP1=0,regI1=0,PID1;
   /* Infinite loop */
@@ -1660,11 +1693,12 @@ void StartFeed(void *argument)
     if(startuem==1&&i<Acceleration_time)
     {
       
-      PWM_M1=1000-M1_start_PWM+(600/Acceleration_time)*i;  //max 90%
+      PWM_M1=1000-M1_start_PWM-(600/Acceleration_time)*i;  //max 90%
       i++;
     }else if(startuem==1&&i>=Acceleration_time) {
       i=0;
       PWM_M1=0;
+      startuem=0;
     }
     //----------------------------------------//
     
@@ -1707,7 +1741,7 @@ void StartFeed(void *argument)
     }else if (Freq_TIM2<130){
       error_my=6; //very hight frequency 
     }
-    Freqency=(uint16_t)(1016-Freq_TIM2/10); //os    
+    Freqency=(uint16_t)(1000-Freq_TIM2/10); //os    
     //enable
     if (feed_motion==0){
       HAL_GPIO_WritePin(Q7_GPIO_Port,Q7_Pin, GPIO_PIN_RESET); 
@@ -1716,13 +1750,13 @@ void StartFeed(void *argument)
       //-------------------pid1------------------------------------------//   
       Error1=feed_speed_sp-Freqency;    //0-1000 zadanie 16-1003 feedback
       regI1=0;
-      for (iter=0; iter<I1; iter++)  
+      for (iter=0; iter<199; iter++)  
       {
         regI1=regI1+errorsold1[iter];
       } 
       regP1=Error1*P1;  
-      regI1 =(I1>0)? (regI1 + Error1):0; 
-      regD1=(Error1-errorsold1[0])*D1; 
+      regI1 =(I1>0)? (regI1 + Error1)*I1:0; 
+      regD1=(Error1-errorsold1[0])*D1*20; //becouse dt is 0.05
       if (regD1<(-10000))
       {
         regD1=(-10000);
@@ -1739,7 +1773,7 @@ void StartFeed(void *argument)
       {
         regI1=(10000);
       }
-      for (iter=254; iter>0; iter--)
+      for (iter=198; iter>0; iter--)
       {
         errorsold1[iter+1]=errorsold1[iter];
       } 
@@ -1760,7 +1794,7 @@ void StartFeed(void *argument)
         {
           PID1=10000;
         }
-        if((PID1>=0)&&(PID1<10000)&&(I_M4<Hi_Current_lim))  //current limit
+        if(I_M4<Hi_Current_lim)  //current limit
         {
           PWM_M4=1999-PID1/10; //output
         }else if((I_M4>=Hi_Current_lim)&&(PWM_M4<1990))

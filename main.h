@@ -247,13 +247,15 @@ void Error_Handler(void);
 #define Brake_time 400  //0.005s*time
 #define Acceleration_time 400  //0.005s*time
 #define P1      100 //proportional
-#define I1      50  //integral     
+#define I1      5  //integral     
 #define D1      3  //defferential
 #define dead_zone1      3 // deadband
 #define direct_pid 0 // direct or reverce pid
 #define Hi_Current_error 900 // limit for hight current 0-1000
 #define Hi_Current_lim 800 // limit for hight current 0-1000
 #define Rotation_lim 50 // limit for current for direction check 0-1000
+#define Feed_Fast_SP 800
+#define  Comissioning 1  //0 when done
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
