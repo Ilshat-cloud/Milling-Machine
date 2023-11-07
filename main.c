@@ -1645,7 +1645,7 @@ void StartComunication(void *argument)
 void StartFeed(void *argument)
 {
   /* USER CODE BEGIN StartFeed */
-  uint8_t startuem=0, M1_motion_prev=0,iter; 
+  uint8_t startuem=0, M1_motion_prev=0,iter,feed_motion_prev=0; 
   uint16_t i=0, Freqency;  //frequency 0-1000 -0 RPM 1000-4000 RPM
   int16_t errorsold1[200]={0};
   int16_t  Error1;
@@ -1745,6 +1745,12 @@ void StartFeed(void *argument)
     //enable
     if (feed_motion==0){
       HAL_GPIO_WritePin(Q7_GPIO_Port,Q7_Pin, GPIO_PIN_RESET); 
+      if (feed_motion_prev!=0){
+        for (iter=0; iter<199; iter++)  
+        {
+          errorsold1[iter]=0;
+        } 
+      }
     }else{
       HAL_GPIO_WritePin(Q7_GPIO_Port,Q7_Pin, GPIO_PIN_SET); 
       //-------------------pid1------------------------------------------//   
@@ -1823,7 +1829,7 @@ void StartFeed(void *argument)
     //----------------------------------------------------------//
     osDelay(5);  //200 hz
     M1_motion_prev=M1_motion;
-    
+    feed_motion_prev=feed_motion;
   }  
 
   /* USER CODE END StartFeed */
