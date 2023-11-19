@@ -1654,7 +1654,8 @@ void StartFeed(void *argument)
   for(;;)
   {
     //--rocking motion actually not rocking---//
-    if ((M1_motion==3)&&(i<Roking_time)){                        
+    if ((M1_motion==3)&&(i<Roking_time)){     
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
       HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
       HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_SET);
       HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
@@ -1665,6 +1666,7 @@ void StartFeed(void *argument)
       HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
       HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
       PWM_M1=1000;      
       M1_motion=0;
       i=0;
@@ -1699,6 +1701,7 @@ void StartFeed(void *argument)
       i=0;
       PWM_M1=0;
       startuem=0;
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_SET); //shunt  
     }
     //----------------------------------------//
     
@@ -1709,6 +1712,7 @@ void StartFeed(void *argument)
       PWM_M1=1000;  
       HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
       HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
     }
     if (M1_motion==4&&i<Brake_time)
     {
@@ -1730,6 +1734,7 @@ void StartFeed(void *argument)
       HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
       HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
       startuem=0;
     }
     //-------------------------------------//
