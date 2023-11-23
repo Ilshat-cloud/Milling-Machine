@@ -933,21 +933,26 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, DO_305_Feed_y_Pin|Q7_Pin|Q8_Pin|SPI_CS_Pin
-                          |INT_Pin|RST_Pin|DO_308_Clamp_x_Pin|DO_306_Feed_z_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, DO_305_Feed_y_Pin|Q7_Pin|Q8_Pin|DO_308_Clamp_x_Pin
+                          |DO_306_Feed_z_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, DO_304_Feed_x_Pin|RE_DE_Pin|DO_310_Clamp_y_Pin|DO_312_Clamp_z_Pin
-                          |led_oil_Pin|led_Temper_Pin|DO_63_K7_Pin|DO_51_K6_Pin
-                          |res_do24v1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, SPI_CS_Pin|INT_Pin|RST_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOG, DO_304_Feed_x_Pin|DO_310_Clamp_y_Pin|DO_312_Clamp_z_Pin|led_oil_Pin
+                          |led_Temper_Pin|DO_63_K7_Pin|DO_51_K6_Pin|res_do24v1_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, Q2_Pin|Q3_Pin|Q4_Pin|Q5_Pin
                           |Q6_Pin|res_do24v2_Pin|led_reserve1_m_Pin|led_X_lock_m_Pin
-                          |led_Z_lock_m_Pin|led_Y_lock_m_Pin|led_reserve3_m_Pin|led_2t_m_Pin, GPIO_PIN_RESET);
+                          |led_Z_lock_m_Pin|led_Y_lock_m_Pin|led_reserve3_m_Pin|led_2t_m_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, led_manual_Pin|led_error_m_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(RE_DE_GPIO_Port, RE_DE_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, led_manual_Pin|led_error_m_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : PE2 PE3 PE7 PE8
                            PE10 PE12 */
@@ -1157,8 +1162,8 @@ void EXTI3_IRQHandler(void)
 void StartMainTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  HAL_GPIO_WritePin(DO_51_K6_GPIO_Port,DO_51_K6_Pin,GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(DO_63_K7_GPIO_Port,DO_63_K7_Pin,GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(DO_51_K6_GPIO_Port,DO_51_K6_Pin,GPIO_PIN_SET);
+  HAL_GPIO_WritePin(DO_63_K7_GPIO_Port,DO_63_K7_Pin,GPIO_PIN_SET);
   HAL_ADC_Stop(&hadc1);
   HAL_ADC_Stop_DMA(&hadc1);
   HAL_ADC_Start_DMA(&hadc1,(uint32_t*)&dma,4);
@@ -1201,19 +1206,19 @@ void StartMainTask(void *argument)
     if (HAL_GPIO_ReadPin(F1_DI_m_GPIO_Port,F1_DI_m_Pin)==GPIO_PIN_SET)
     {
       error_my=3;
-      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_RESET);
     }
     // Temperature error F2
     if (HAL_GPIO_ReadPin(F2_DI_m_GPIO_Port,F2_DI_m_Pin)==GPIO_PIN_SET)
     {
       error_my=4;
-      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_RESET);
     }
     // Temperature error F3
     if (HAL_GPIO_ReadPin(F3_DI_m_GPIO_Port,F3_DI_m_Pin)==GPIO_PIN_SET)
     {
       error_my=5;
-      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_RESET);
     }
       
      // oil pump on
@@ -1239,18 +1244,18 @@ void StartMainTask(void *argument)
     {
       if ((feed_motion!=1)||(feed_motion!=2))
       {
-        HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_RESET);
       }
       if ((feed_motion!=3)||(feed_motion!=4))
       {
-        HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_RESET);
       }
       if ((feed_motion!=5)||(feed_motion!=6))
       {
-        HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_RESET);  //reset mens on
       }
     } 
     //unclamp X
@@ -1258,24 +1263,24 @@ void StartMainTask(void *argument)
     Unlock_X.pos_current=HAL_GPIO_ReadPin(DI_88_S16_m_GPIO_Port,DI_88_S16_m_Pin);
     if ((Unlock_X.pos_previous==GPIO_PIN_SET)&&(Unlock_X.pos_current==GPIO_PIN_RESET))  
     {
-      HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_SET);
     }
     //unclamp Y
     Unlock_Y.pos_previous=Unlock_Y.pos_current;
     Unlock_Y.pos_current=HAL_GPIO_ReadPin(DI_89_S17_m_GPIO_Port,DI_89_S17_m_Pin);
     if ((Unlock_Y.pos_previous==GPIO_PIN_SET)&&(Unlock_Y.pos_current==GPIO_PIN_RESET))  
     {    
-      HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_SET);
     }    
     //unclamp Z
     Unlock_Z.pos_previous=Unlock_Z.pos_current;
     Unlock_Z.pos_current=HAL_GPIO_ReadPin(DI_90_S18_m_GPIO_Port,DI_90_S18_m_Pin);
     if ((Unlock_Z.pos_previous==GPIO_PIN_SET)&&(Unlock_Z.pos_current==GPIO_PIN_RESET))      
     {
-      HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_RESET);   
+      HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_SET);   
     }      
     
     //motion defenition 2 t 4 t  man/auto end swich
@@ -1383,9 +1388,9 @@ void StartMainTask(void *argument)
     switch (feed_motion) //check endswiches
     {
     case 0:
-      HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement
-      HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement
-      HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement
+      HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement
+      HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement
+      HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement
       
       
       break;
@@ -1393,66 +1398,66 @@ void StartMainTask(void *argument)
       if (limit_switches&1){
         feed_motion=0;
       } else{
-        HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement
       }
       break;
     case 2:
       if (limit_switches&2){
         feed_motion=0;
       } else{
-        HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement        
+        HAL_GPIO_WritePin(led_X_lock_m_GPIO_Port,led_X_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_308_Clamp_x_GPIO_Port,DO_308_Clamp_x_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement        
       }
       break;
     case 3:
       if (limit_switches&4){
         feed_motion=0;
       } else {        
-        HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement     
-        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement
+        HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement     
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement
       }
       break;   
     case 4:
       if (limit_switches&8){
         feed_motion=0;
       } else {                
-        HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement      
-        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement        
+        HAL_GPIO_WritePin(led_Y_lock_m_GPIO_Port,led_Y_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_310_Clamp_y_GPIO_Port,DO_310_Clamp_y_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement      
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement        
       }
       break;
     case 5:
       if (limit_switches&16){
         feed_motion=0;
       } else {                
-        HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_RESET);  
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET); //cluch engadement     
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement      
-        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement        
+        HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_SET);  
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET); //cluch engadement     
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement      
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement        
       }  
       break;   
     case 6:
       if (limit_switches&32){
         feed_motion=0;
       } else {             
-        HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_RESET);  
-        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_SET);  //cluch engadement   
-        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_RESET);  //cluch engadement      
-        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_RESET);  //cluch engadement               
+        HAL_GPIO_WritePin(led_Z_lock_m_GPIO_Port,led_Z_lock_m_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(DO_312_Clamp_z_GPIO_Port,DO_312_Clamp_z_Pin,GPIO_PIN_SET);  
+        HAL_GPIO_WritePin(DO_306_Feed_z_GPIO_Port,DO_306_Feed_z_Pin,GPIO_PIN_RESET);  //cluch engadement   
+        HAL_GPIO_WritePin(DO_305_Feed_y_GPIO_Port,DO_305_Feed_y_Pin,GPIO_PIN_SET);  //cluch engadement      
+        HAL_GPIO_WritePin(DO_304_Feed_x_GPIO_Port,DO_304_Feed_x_Pin,GPIO_PIN_SET);  //cluch engadement               
       }
       break;        
     }
@@ -1474,10 +1479,10 @@ void StartMainTask(void *argument)
     if (HAL_GPIO_ReadPin(DI_91_S19_m_GPIO_Port,DI_91_S19_m_Pin)==GPIO_PIN_SET)
     {
       feed_speed_sp=feed_sp_temp/120;    //0-1000 /3-buf /4-1024/ 10- 100
-      HAL_GPIO_WritePin(led_2t_m_GPIO_Port,led_2t_m_Pin,GPIO_PIN_SET); 
+      HAL_GPIO_WritePin(led_2t_m_GPIO_Port,led_2t_m_Pin,GPIO_PIN_RESET); 
     } else{
       feed_speed_sp=feed_sp_temp/12;    //0-1000 /3-buf /4-1024
-      HAL_GPIO_WritePin(led_2t_m_GPIO_Port,led_2t_m_Pin,GPIO_PIN_RESET); 
+      HAL_GPIO_WritePin(led_2t_m_GPIO_Port,led_2t_m_Pin,GPIO_PIN_SET); 
     }
     if (HAL_GPIO_ReadPin(DI_92_S20_m_GPIO_Port,DI_92_S20_m_Pin)==GPIO_PIN_SET)
     {
@@ -1488,15 +1493,15 @@ void StartMainTask(void *argument)
     // gripe instrument
     if ((HAL_GPIO_ReadPin(S11Gripe_GPIO_Port,S11Gripe_Pin)==GPIO_PIN_SET)&&(M1_motion==0)&&(feed_motion==0))
     {
-      HAL_GPIO_WritePin(DO_51_K6_GPIO_Port,DO_51_K6_Pin,GPIO_PIN_SET);
-    } else{
       HAL_GPIO_WritePin(DO_51_K6_GPIO_Port,DO_51_K6_Pin,GPIO_PIN_RESET);
+    } else{
+      HAL_GPIO_WritePin(DO_51_K6_GPIO_Port,DO_51_K6_Pin,GPIO_PIN_SET);
     }
     if ((HAL_GPIO_ReadPin(S12ungrip_GPIO_Port,S12ungrip_Pin)==GPIO_PIN_SET)&&(M1_motion==0)&&(feed_motion==0))
     {
-      HAL_GPIO_WritePin(DO_63_K7_GPIO_Port,DO_63_K7_Pin,GPIO_PIN_SET);
-    } else{
       HAL_GPIO_WritePin(DO_63_K7_GPIO_Port,DO_63_K7_Pin,GPIO_PIN_RESET);
+    } else{
+      HAL_GPIO_WritePin(DO_63_K7_GPIO_Port,DO_63_K7_Pin,GPIO_PIN_SET);
     }        
     //----------------------------------------//
     
@@ -1538,33 +1543,33 @@ void StartMainTask(void *argument)
       
       if (oil_pump_state!=0)
       {
-        HAL_GPIO_WritePin(Q2_GPIO_Port,Q2_Pin,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(led_oil_GPIO_Port,led_oil_Pin,GPIO_PIN_SET);
-      }else{
-        oil_pump_state=0;
         HAL_GPIO_WritePin(Q2_GPIO_Port,Q2_Pin,GPIO_PIN_RESET);
         HAL_GPIO_WritePin(led_oil_GPIO_Port,led_oil_Pin,GPIO_PIN_RESET);
+      }else{
+        oil_pump_state=0;
+        HAL_GPIO_WritePin(Q2_GPIO_Port,Q2_Pin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(led_oil_GPIO_Port,led_oil_Pin,GPIO_PIN_SET);
       }
       //----------------------------------------//
       // coolant pump on
       if (HAL_GPIO_ReadPin(DI_63_S9_m_GPIO_Port,DI_63_S9_m_Pin)==GPIO_PIN_SET)
       {
-        HAL_GPIO_WritePin(Q5_GPIO_Port,Q5_Pin,GPIO_PIN_SET);
-      } else {
         HAL_GPIO_WritePin(Q5_GPIO_Port,Q5_Pin,GPIO_PIN_RESET);
+      } else {
+        HAL_GPIO_WritePin(Q5_GPIO_Port,Q5_Pin,GPIO_PIN_SET);
       }
       //----------------------------------------//
-      HAL_GPIO_WritePin(led_error_m_GPIO_Port,led_error_m_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(led_error_m_GPIO_Port,led_error_m_Pin, GPIO_PIN_SET);
       
       
     }else{
       M1_motion=0;
       feed_speed_sp=0;
-      HAL_GPIO_WritePin(Q5_GPIO_Port,Q5_Pin,GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(Q2_GPIO_Port,Q2_Pin,GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(led_oil_GPIO_Port,led_oil_Pin,GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(led_error_m_GPIO_Port,led_error_m_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q5_GPIO_Port,Q5_Pin,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q2_GPIO_Port,Q2_Pin,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(led_oil_GPIO_Port,led_oil_Pin,GPIO_PIN_SET);
+      HAL_GPIO_WritePin(led_Temper_GPIO_Port,led_Temper_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(led_error_m_GPIO_Port,led_error_m_Pin, GPIO_PIN_RESET);
     }
     
     
@@ -1615,12 +1620,12 @@ void StartComunication(void *argument)
       }
       if (error_my==error_counter/2)
       {
-        HAL_GPIO_WritePin(led_manual_GPIO_Port,led_manual_Pin,GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(led_manual_GPIO_Port,led_manual_Pin,GPIO_PIN_SET);
         error_counter=0;
       }
     }
     else {
-      HAL_GPIO_WritePin(led_manual_GPIO_Port,led_manual_Pin,GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(led_manual_GPIO_Port,led_manual_Pin,GPIO_PIN_SET);
     }
 #if Comissioning==1 
     state_uart=HAL_UART_GetState(&huart4);
@@ -1655,18 +1660,18 @@ void StartFeed(void *argument)
   {
     //--rocking motion actually not rocking---//
     if ((M1_motion==3)&&(i<Roking_time)){     
-      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
-      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
-      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_SET); //shunt  
+      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_SET);  
+      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_SET);
       PWM_M1=1000-M1_start_PWM;  
       i++;
     }else if((M1_motion==3)&&(i>=Roking_time))
     {
-      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
-      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
+      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_SET);  
+      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_SET); //shunt  
       PWM_M1=1000;      
       M1_motion=0;
       i=0;
@@ -1678,18 +1683,18 @@ void StartFeed(void *argument)
     {
       i=0;
       PWM_M1=1000;  
-      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
-      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_SET);  
+      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_SET);
       startuem=1;
     }    
     if (M1_motion==2&&M1_motion_prev==0)  //left
     {
       i=0;
       PWM_M1=1000;  
-      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_SET);  
-      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
+      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_SET);
       startuem=1;
     }    
     if(startuem==1&&i<Acceleration_time)
@@ -1701,7 +1706,7 @@ void StartFeed(void *argument)
       i=0;
       PWM_M1=0;
       startuem=0;
-      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_SET); //shunt  
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
     }
     //----------------------------------------//
     
@@ -1710,17 +1715,17 @@ void StartFeed(void *argument)
     {
       i=0;
       PWM_M1=1000;  
-      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
-      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
+      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_SET);  
+      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_SET); //shunt  
     }
     if (M1_motion==4&&i<Brake_time)
     {
-      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
       i++;
     }else if((M1_motion==4)&&(i>=Brake_time))
     {
-      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_SET);
       i=0;
       M1_motion=0;
     }
@@ -1731,10 +1736,10 @@ void StartFeed(void *argument)
     {
       i=0;
       PWM_M1=1000;  
-      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_RESET);  
-      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_RESET); //shunt  
+      HAL_GPIO_WritePin(Q4_GPIO_Port,Q4_Pin, GPIO_PIN_SET);  
+      HAL_GPIO_WritePin(Q3_GPIO_Port,Q3_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q6_GPIO_Port,Q6_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(Q8_GPIO_Port,Q8_Pin, GPIO_PIN_SET); //shunt  
       startuem=0;
     }
     //-------------------------------------//
@@ -1749,7 +1754,7 @@ void StartFeed(void *argument)
     Freqency=(uint16_t)(1000-Freq_TIM2/10); //os    
     //enable
     if (feed_motion==0){
-      HAL_GPIO_WritePin(Q7_GPIO_Port,Q7_Pin, GPIO_PIN_RESET); 
+      HAL_GPIO_WritePin(Q7_GPIO_Port,Q7_Pin, GPIO_PIN_SET); 
       if (feed_motion_prev!=0){
         for (iter=0; iter<199; iter++)  
         {
@@ -1757,7 +1762,7 @@ void StartFeed(void *argument)
         } 
       }
     }else{
-      HAL_GPIO_WritePin(Q7_GPIO_Port,Q7_Pin, GPIO_PIN_SET); 
+      HAL_GPIO_WritePin(Q7_GPIO_Port,Q7_Pin, GPIO_PIN_RESET); 
       //-------------------pid1------------------------------------------//   
       Error1=feed_speed_sp-Freqency;    //0-1000 zadanie 16-1003 feedback
       regI1=0;
